@@ -20,7 +20,10 @@
 
 #include <stdio.h>
 #include "zlib.h"
-#include "unistd.h"
+
+#ifdef PLATFORM_EMSCRIPTEN
+    #include "unistd.h"
+#endif
 
 #ifdef STDC
 #  include <string.h>
