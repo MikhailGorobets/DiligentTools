@@ -99,7 +99,7 @@ struct TextureInitData : public ObjectBase<IObject>
                 (FmtAttribs.ComponentType != COMPONENT_TYPE_COMPRESSED ? Uint32{FmtAttribs.NumComponents} : 1);
             const auto MipSize = Level.SubResData.Stride * Level.Height / Uint32{FmtAttribs.BlockHeight};
 
-            Level.Data.resize(MipSize);
+            Level.Data.resize(static_cast<size_t>(MipSize));
             Level.SubResData.pData = Level.Data.data();
 
             if (FmtAttribs.ComponentType != COMPONENT_TYPE_COMPRESSED)
@@ -141,7 +141,7 @@ static RefCntAutoPtr<TextureInitData> PrepareGLTFTextureInitData(
 
     if (gltfimage.component == 3)
     {
-        Level0.Data.resize(Level0Stride * gltfimage.height);
+        Level0.Data.resize(static_cast<size_t>(Level0Stride * gltfimage.height));
 
         // Due to depressing performance of iterators in debug MSVC we have to use raw pointers here
         const auto* rgb  = gltfimage.image.data();
@@ -163,7 +163,7 @@ static RefCntAutoPtr<TextureInitData> PrepareGLTFTextureInitData(
     {
         if (AlphaCutoff > 0)
         {
-            Level0.Data.resize(Level0Stride * gltfimage.height);
+            Level0.Data.resize(static_cast<size_t>(Level0Stride * gltfimage.height));
 
             // Remap alpha channel using the following formula to improve mip maps:
             //
@@ -933,7 +933,7 @@ void Model::LoadTextures(IRenderDevice*         pDevice,
 
                 auto& Level0Stride{Level0.SubResData.Stride};
                 Level0Stride = Level0.Width * 4;
-                Level0.Data.resize(Level0Stride * TexDesc.Height);
+                Level0.Data.resize(static_cast<size_t>(Level0Stride * TexDesc.Height));
                 Level0.SubResData.pData = Level0.Data.data();
                 GenerateCheckerBoardPattern(TexDesc.Width, TexDesc.Height, TexDesc.Format, 4, 4, Level0.Data.data(), Level0Stride);
 
@@ -968,7 +968,7 @@ void Model::PrepareGPUResources(IRenderDevice* pDevice, IDeviceContext* pCtx)
         if (DstTexInfo.pAtlasSuballocation)
         {
             pTexture  = DstTexInfo.pAtlasSuballocation->GetAtlas()->GetTexture(pDevice, pCtx);
-            pInitData = ValidatedCast<TextureInitData>(DstTexInfo.pAtlasSuballocation->GetUserData());
+            pInitData = ClassPtrCast<TextureInitData>(DstTexInfo.pAtlasSuballocation->GetUserData());
             // User data is only set when the allocation is created, so no other
             // thread can call SetUserData() in parallel.
             DstTexInfo.pAtlasSuballocation->SetUserData(nullptr);
@@ -976,7 +976,7 @@ void Model::PrepareGPUResources(IRenderDevice* pDevice, IDeviceContext* pCtx)
         else if (DstTexInfo.pTexture)
         {
             pTexture  = DstTexInfo.pTexture;
-            pInitData = ValidatedCast<TextureInitData>(pTexture->GetUserData());
+            pInitData = ClassPtrCast<TextureInitData>(pTexture->GetUserData());
             // User data is only set when the texture is created, so no other
             // thread can call SetUserData() in parallel.
             pTexture->SetUserData(nullptr);
@@ -1851,12 +1851,12 @@ void Model::LoadFromFile(IRenderDevice*    pDevice,
         else
         {
             BufferDesc BuffDesc;
-            BuffDesc.Name          = Name;
-            BuffDesc.uiSizeInBytes = BufferSize;
-            BuffDesc.BindFlags     = BindFlags;
-            BuffDesc.Usage         = USAGE_IMMUTABLE;
+            BuffDesc.Name      = Name;
+            BuffDesc.Size      = BufferSize;
+            BuffDesc.BindFlags = BindFlags;
+            BuffDesc.Usage     = USAGE_IMMUTABLE;
 
-            BufferData BuffData{pData, BuffDesc.uiSizeInBytes};
+            BufferData BuffData{pData, BuffDesc.Size};
             pDevice->CreateBuffer(BuffDesc, &BuffData, &Buffers[BuffId].pBuffer);
         }
     };
