@@ -29,14 +29,38 @@
 #include <string>
 
 #include "NativeAppBase.hpp"
+#include "Timer.hpp"
 
-std::unique_ptr<Diligent::NativeAppBase> g_pTheApp;
+std::unique_ptr<Diligent::NativeAppBase> g_pTheApp  = nullptr;
+Diligent::Timer                          g_Timer    = {};
+double                                   g_PrevTime = 0.0;
 
 void EventLoopCallback()
 {
-    g_pTheApp->Update();
-    g_pTheApp->Render();
+    auto CurrTime    = g_Timer.GetElapsedTime();
+    auto ElapsedTime = CurrTime - g_PrevTime;
+    g_PrevTime       = CurrTime;
+
+    if (g_pTheApp->IsReady())
+    {
+        g_pTheApp->Update(CurrTime, ElapsedTime);
+        g_pTheApp->Render();
+    }
 }
+
+
+EM_BOOL EventResizeCallback(int32_t EventType, const EmscriptenUiEvent* UIEvent, void* UserData)
+{
+    if (g_pTheApp->IsReady())
+    {
+        double Width  = 0;
+        double Height = 0;
+        emscripten_get_element_css_size("#canvas", &Width, &Height);
+        g_pTheApp->WindowResize(static_cast<int32_t>(Width), static_cast<int32_t>(Height));
+    }
+    return true;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -45,13 +69,15 @@ int main(int argc, char* argv[])
     int32_t WindowWidth  = 0;
     int32_t WindowHeight = 0;
 
-    std::string CmdLine = "-mode GLES -width 1920 -height 1280";
+    std::string CmdLine = "-width 1920 -height 1280 show-ui";
     g_pTheApp->ProcessCommandLine(CmdLine.c_str());
     g_pTheApp->GetDesiredInitialWindowSize(WindowWidth, WindowHeight);
 
     emscripten_set_canvas_element_size("#canvas", WindowWidth, WindowHeight);
     g_pTheApp->OnWindowCreated("#canvas", WindowWidth, WindowHeight);
 
+    emscripten_set_resize_callback("#canvas", nullptr, false, EventResizeCallback);
     emscripten_set_main_loop(EventLoopCallback, 0, true);
+
     g_pTheApp.reset();
 }
