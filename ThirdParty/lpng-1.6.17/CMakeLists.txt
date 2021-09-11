@@ -43,6 +43,16 @@ if(MSVC)
     endif()
 endif()
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
+    CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set_source_files_properties(
+        pngread.c
+        PROPERTIES
+        COMPILE_FLAGS "-Wno-unused-but-set-variable"
+    )
+endif()
+
+
 target_include_directories(LibPng 
 INTERFACE
     .

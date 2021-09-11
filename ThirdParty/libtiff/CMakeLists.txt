@@ -98,8 +98,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
     #   cast to pointer from integer of different size [-Wint-to-pointer-cast]
     set_source_files_properties(
         tif_unix.c
+        tif_lzw.c
         PROPERTIES 
-        COMPILE_FLAGS "-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast"
+        COMPILE_FLAGS "-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-unused-but-set-variable"
     )
 endif()
 

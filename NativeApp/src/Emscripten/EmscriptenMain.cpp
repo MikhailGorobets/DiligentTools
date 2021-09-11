@@ -1,6 +1,5 @@
 /*
  *  Copyright 2019-2021 Diligent Graphics LLC
- *  Copyright 2015-2019 Egor Yusov
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,9 +22,11 @@
  *  of the possibility of such damages.
  */
 
-#include <GLFW/glfw3.h>
 #include <emscripten.h>
+#include <emscripten/html5.h>
+
 #include <memory>
+#include <string>
 
 #include "NativeAppBase.hpp"
 
@@ -35,23 +36,22 @@ void EventLoopCallback()
 {
     g_pTheApp->Update();
     g_pTheApp->Render();
-    g_pTheApp->Present();
 }
 
 int main(int argc, char* argv[])
 {
-    const auto WINDOW_TITLE  = "Emscripten";
-    const auto WINDOW_WIDTH  = 1920;
-    const auto WINDOW_HEIGHT = 1280;
-
-    glfwInit();
-    std::unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> pWindow(
-        glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr),
-        glfwDestroyWindow);
-
     g_pTheApp.reset(Diligent::CreateApplication());
-    g_pTheApp->Initialize();
+
+    int32_t WindowWidth  = 0;
+    int32_t WindowHeight = 0;
+
+    std::string CmdLine = "-mode GLES -width 1920 -height 1280";
+    g_pTheApp->ProcessCommandLine(CmdLine.c_str());
+    g_pTheApp->GetDesiredInitialWindowSize(WindowWidth, WindowHeight);
+
+    emscripten_set_canvas_element_size("#canvas", WindowWidth, WindowHeight);
+    g_pTheApp->OnWindowCreated("#canvas", WindowWidth, WindowHeight);
+
     emscripten_set_main_loop(EventLoopCallback, 0, true);
     g_pTheApp.reset();
-    glfwTerminate();
 }

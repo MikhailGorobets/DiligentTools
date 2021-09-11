@@ -273,7 +273,7 @@ elseif(PLATFORM_IOS)
         )
 
         set(APPLE_INCLUDE_DIRS
-                ${NATIVE_APP_SOURCE_DIR}/Apple/Source/Classes/iOS
+            ${NATIVE_APP_SOURCE_DIR}/Apple/Source/Classes/iOS
         )
 
         add_executable(${TARGET_NAME} MACOSX_BUNDLE ${SOURCE} ${APPLE_SOURCE} ${INCLUDE} ${APPLE_INCLUDE} ${ASSETS} ${APPLE_RESOURCES})
@@ -395,7 +395,7 @@ elseif(PLATFORM_EMSCRIPTEN)
     )
 
     function(add_emscripten_app TARGET_NAME SOURCE INCLUDE ASSETS)
-        add_executable(${TARGET_NAME} ${SOURCE} ${INCLUDE} ${ASSETS})
+        add_executable(${TARGET_NAME} ${SOURCE} ${INCLUDE} ${ASSETS})   
     endfunction()
 
     function(add_target_platform_app TARGET_NAME SOURCE INCLUDE ASSETS)

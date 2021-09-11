@@ -34,19 +34,21 @@ namespace Diligent
 class EmscriptenAppBase : public AppBase
 {
 public:
-    virtual void Initialize() = 0;
+    virtual void OnWindowCreated(const char* pCanvasID,
+                                 int32_t     WindowWidth,
+                                 int32_t     WindowHeight) = 0;
 
     void Update()
     {
         // Render the scene
-        auto CurrTime    = timer.GetElapsedTime();
+        auto CurrTime    = Timer.GetElapsedTime();
         auto ElapsedTime = CurrTime - PrevTime;
         PrevTime         = CurrTime;
         AppBase::Update(CurrTime, ElapsedTime);
     }
 
 protected:
-    Timer  timer;
+    Timer  Timer;
     double PrevTime = 0.0;
 };
 
