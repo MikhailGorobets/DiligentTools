@@ -50,6 +50,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         PROPERTIES
         COMPILE_FLAGS "-Wno-unused-but-set-variable"
     )
+    if (PLATFORM_EMSCRIPTEN)
+        set_source_files_properties(
+            pngrutil.c
+            PROPERTIES
+            COMPILE_FLAGS "-Wno-null-pointer-subtraction"
+    )
+    endif()
 endif()
 
 

@@ -26,7 +26,10 @@
 
 #include "imgui.h"
 #include "ImGuiImplEmscripten.hpp"
+#include "..\interface\ImGuiImplEmscripten.hpp"
 
+#include <emscripten.h>
+#include <emscripten/html5.h>
 
 namespace Diligent
 {
@@ -64,4 +67,40 @@ void ImGuiImplEmscripten::Render(IDeviceContext* pCtx)
     ImGuiImplDiligent::Render(pCtx);
 }
 
+bool ImGuiImplEmscripten::OnMouseEvent(int32_t EventType, const EmscriptenMouseEvent* Event)
+{
+    auto& io = ImGui::GetIO();
+
+    uint32_t MouseButtonRemap[] = {0, 2, 1};
+
+    switch (EventType)
+    {
+        case EMSCRIPTEN_EVENT_MOUSEDOWN:
+            io.MouseDown[MouseButtonRemap[Event->button]] = true;
+            return io.WantCaptureMouse;
+        case EMSCRIPTEN_EVENT_MOUSEUP:
+            io.MouseDown[MouseButtonRemap[Event->button]] = false;
+            return io.WantCaptureMouse;
+            break;
+        case EMSCRIPTEN_EVENT_MOUSEMOVE:
+            io.MousePos = ImVec2(Event->targetX, Event->targetY);
+            return io.WantCaptureMouse;
+            break;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool ImGuiImplEmscripten::OnWheelEvent(int32_t EventType, const EmscriptenWheelEvent* Event)
+{
+    // auto& io = ImGui::GetIO();
+    return false;
+}
+
+bool ImGuiImplEmscripten::OnKeyEvent(int32_t EventType, const EmscriptenKeyboardEvent* Event)
+{
+    // auto& io = ImGui::GetIO();
+    return false;
+}
 } // namespace Diligent

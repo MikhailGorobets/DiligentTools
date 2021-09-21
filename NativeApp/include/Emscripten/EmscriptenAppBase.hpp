@@ -27,6 +27,10 @@
 #include "AppBase.hpp"
 #include "Timer.hpp"
 
+struct EmscriptenMouseEvent;
+struct EmscriptenWheelEvent;
+struct EmscriptenKeyboardEvent;
+
 namespace Diligent
 {
 
@@ -35,6 +39,12 @@ class EmscriptenAppBase : public AppBase
 {
 public:
     using AppBase::Update;
+
+    virtual void OnMouseEvent(int32_t EventType, const EmscriptenMouseEvent* Event) = 0;
+
+    virtual void OnWheelEvent(int32_t EventType, const EmscriptenWheelEvent* Event) = 0;
+
+    virtual void OnKeyEvent(int32_t EventType, const EmscriptenKeyboardEvent* Event) = 0;
 
     virtual void OnWindowCreated(const char* pCanvasID,
                                  int32_t     WindowWidth,

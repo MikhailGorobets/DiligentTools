@@ -30,6 +30,10 @@
 #include <chrono>
 #include "ImGuiImplDiligent.hpp"
 
+struct EmscriptenMouseEvent;
+struct EmscriptenWheelEvent;
+struct EmscriptenKeyboardEvent;
+
 namespace Diligent
 {
 
@@ -54,6 +58,13 @@ public:
                           Uint32            RenderSurfaceHeight,
                           SURFACE_TRANSFORM SurfacePreTransform) override final;
     virtual void Render(IDeviceContext* pCtx) override final;
+
+    bool OnMouseEvent(int32_t EventType, const EmscriptenMouseEvent* Event);
+
+    bool OnWheelEvent(int32_t EventType, const EmscriptenWheelEvent* Event);
+
+    bool OnKeyEvent(int32_t EventType, const EmscriptenKeyboardEvent* Event);
+
 
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_LastTimestamp = {};
