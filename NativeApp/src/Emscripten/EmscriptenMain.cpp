@@ -51,12 +51,7 @@ void EventLoopCallback()
 EM_BOOL EventResizeCallback(int32_t EventType, const EmscriptenUiEvent* Event, void* pUserData)
 {
     if (g_pTheApp->IsReady())
-    {
-        double Width  = 0;
-        double Height = 0;
-        emscripten_get_element_css_size("#canvas", &Width, &Height);
-        g_pTheApp->WindowResize(static_cast<int32_t>(Width), static_cast<int32_t>(Height));
-    }
+        g_pTheApp->WindowResize(Event->documentBodyClientWidth, Event->documentBodyClientHeight);
     return true;
 }
 
@@ -92,19 +87,16 @@ int main(int argc, char* argv[])
     g_pTheApp->GetDesiredInitialWindowSize(WindowWidth, WindowHeight);
 
     emscripten_set_canvas_element_size(CanvasID, WindowWidth, WindowHeight);
-    emscripten_set_click_callback(CanvasID, nullptr, true, EventMouseCallback);
     emscripten_set_mousedown_callback(CanvasID, nullptr, true, EventMouseCallback);
     emscripten_set_mouseup_callback(CanvasID, nullptr, true, EventMouseCallback);
-    emscripten_set_dblclick_callback(CanvasID, nullptr, true, EventMouseCallback);
     emscripten_set_mousemove_callback(CanvasID, nullptr, true, EventMouseCallback);
     emscripten_set_wheel_callback(CanvasID, nullptr, true, EventWheelCallback);
-    emscripten_set_keypress_callback(CanvasID, nullptr, true, EventKeyCallback);
     emscripten_set_keydown_callback(CanvasID, nullptr, true, EventKeyCallback);
     emscripten_set_keyup_callback(CanvasID, nullptr, true, EventKeyCallback);
+    emscripten_set_keypress_callback(CanvasID, nullptr, true, EventKeyCallback);
+    emscripten_set_resize_callback(CanvasID, nullptr, true, EventResizeCallback);
 
     g_pTheApp->OnWindowCreated(CanvasID, WindowWidth, WindowHeight);
-
-    emscripten_set_resize_callback(CanvasID, nullptr, false, EventResizeCallback);
     emscripten_set_main_loop(EventLoopCallback, 0, true);
 
     g_pTheApp.reset();

@@ -49,6 +49,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
     if (PLATFORM_EMSCRIPTEN)
         set_source_files_properties(
             pngrutil.c
+            pngread.c
             PROPERTIES
             COMPILE_FLAGS "-Wno-unknown-warning-option -Wno-null-pointer-subtraction -Wno-unused-but-set-variable"
     )
