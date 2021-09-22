@@ -100,8 +100,16 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         tif_unix.c
         tif_lzw.c
         PROPERTIES 
-        COMPILE_FLAGS "-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-unused-but-set-variable"
+        COMPILE_FLAGS "-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast"
     )
+    if (PLATFORM_EMSCRIPTEN)
+        set_source_files_properties(
+            tif_unix.c
+            tif_lzw.c
+            PROPERTIES 
+            COMPILE_FLAGS "-Wno-unknown-warning-option -Wno-unused-but-set-variable"
+        )
+    endif()
 endif()
 
 target_link_libraries(LibTiff PRIVATE Diligent-BuildSettings)

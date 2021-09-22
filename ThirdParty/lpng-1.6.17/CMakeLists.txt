@@ -45,16 +45,12 @@ endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
     CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set_source_files_properties(
-        pngread.c
-        PROPERTIES
-        COMPILE_FLAGS "-Wno-unused-but-set-variable"
-    )
+  
     if (PLATFORM_EMSCRIPTEN)
         set_source_files_properties(
             pngrutil.c
             PROPERTIES
-            COMPILE_FLAGS "-Wno-null-pointer-subtraction"
+            COMPILE_FLAGS "-Wno-unknown-warning-option -Wno-null-pointer-subtraction -Wno-unused-but-set-variable"
     )
     endif()
 endif()
