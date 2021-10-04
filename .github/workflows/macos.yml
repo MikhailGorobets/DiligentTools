@@ -26,13 +26,7 @@ jobs:
         submodules: recursive
 
     - name: Download Vulkan SDK
-      if: success()
-      working-directory: DiligentCore
-      shell: bash
-      run: |
-        cd ./BuildTools/Scripts/github_actions
-        chmod +x vulkan_sdk.sh
-        ./vulkan_sdk.sh
+      uses: ./DiligentCore/.github/actions/configure-vulkan
 
     - name: Configure CMake
       if: success()

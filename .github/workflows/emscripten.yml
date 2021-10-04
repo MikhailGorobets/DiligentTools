@@ -2,6 +2,9 @@ name: Emscripten
 
 on: [push, pull_request]
 
+env:
+  dependencies: '["DiligentCore", "DiligentTools"]'
+
 jobs:
   build-win10:
     strategy:
@@ -25,30 +28,22 @@ jobs:
         path:       DiligentCore
         submodules: recursive
 
-    - name: Configure Ninja
-      uses: seanmiddleditch/gha-setup-ninja@master
-
-    - name: Configure Emscripten SDK version
-      if: success()
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        ./emscripten_sdk.sh "$GITHUB_WORKSPACE"
+    - name: Download and Configure Emscripten Toolchain
+      uses: ./DiligentCore/.github/actions/configure-emscripten
 
     - name: Configure CMake
-      if: success()
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE/DiligentTools/BuildTools/Scripts/github_actions
-        ./create_cmake.sh "$GITHUB_WORKSPACE"
-        cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        ./configure_cmake.sh "emscripten" "${{runner.workspace}}" ${{ matrix.config }} "-DDILIGENT_BUILD_TOOLS_INCLUDE_TEST=ON -DDILIGENT_BUILD_TOOLS_TESTS=ON"
+      uses: ./DiligentCore/.github/actions/configure-cmake
+      with:
+        platform: emscripten
+        workspace: $GITHUB_WORKSPACE
+        config: ${{ matrix.config }}
+        args: "-DDILIGENT_BUILD_CORE_TESTS=ON"
+        submodules: ${{ env.dependencies }}
 
     - name: Build
       if: success()
-      working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . 
+      run: cmake --build ./build
 
   build-linux:
     strategy:
@@ -72,33 +67,21 @@ jobs:
         path:       DiligentCore
         submodules: recursive
 
-    - name: Configure Ninja
-      uses: seanmiddleditch/gha-setup-ninja@master
-
-    - name: Configure Emscripten SDK version
-      if: success()
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        chmod +x ./emscripten_sdk.sh
-        ./emscripten_sdk.sh "$GITHUB_WORKSPACE"
+    - name: Download and Configure Emscripten Toolchain
+      uses: ./DiligentCore/.github/actions/configure-emscripten
 
     - name: Configure CMake
-      if: success()
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE/DiligentTools/BuildTools/Scripts/github_actions
-        chmod +x create_cmake.sh
-        ./create_cmake.sh "$GITHUB_WORKSPACE"
-        cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        chmod +x configure_cmake.sh
-        ./configure_cmake.sh "emscripten" "${{runner.workspace}}" ${{ matrix.config }} "-DDILIGENT_BUILD_TOOLS_INCLUDE_TEST=ON -DDILIGENT_BUILD_TOOLS_TESTS=ON"
+      uses: ./DiligentCore/.github/actions/configure-cmake
+      with:
+        platform: emscripten
+        workspace: $GITHUB_WORKSPACE
+        config: ${{ matrix.config }}
+        args: "-DDILIGENT_BUILD_CORE_TESTS=ON"
+        submodules: ${{ env.dependencies }}
 
     - name: Build
-      if: success()
-      working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . 
+      run: cmake --build ./build
 
   build-macos:
     strategy:
@@ -122,30 +105,18 @@ jobs:
         path:       DiligentCore
         submodules: recursive
 
-    - name: Configure Ninja
-      uses: seanmiddleditch/gha-setup-ninja@master
-
-    - name: Configure Emscripten SDK version
-      if: success()
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        chmod +x ./emscripten_sdk.sh
-        ./emscripten_sdk.sh "$GITHUB_WORKSPACE"
+    - name: Download and Configure Emscripten Toolchain
+      uses: ./DiligentCore/.github/actions/configure-emscripten
 
     - name: Configure CMake
-      if: success()
-      shell: bash
-      run: |
-        cd $GITHUB_WORKSPACE/DiligentTools/BuildTools/Scripts/github_actions
-        chmod +x create_cmake.sh
-        ./create_cmake.sh "$GITHUB_WORKSPACE"
-        cd $GITHUB_WORKSPACE/DiligentCore/BuildTools/Scripts/github_actions
-        chmod +x configure_cmake.sh
-        ./configure_cmake.sh "emscripten" "${{runner.workspace}}" ${{ matrix.config }}
+      uses: ./DiligentCore/.github/actions/configure-cmake
+      with:
+        platform: emscripten
+        workspace: $GITHUB_WORKSPACE
+        config: ${{ matrix.config }}
+        args: "-DDILIGENT_BUILD_CORE_TESTS=ON"
+        submodules: ${{ env.dependencies }}
 
     - name: Build
-      if: success()
-      working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build .
+      run: cmake --build ./build
