@@ -96,4 +96,10 @@ void ImGuiImplDiligent::CreateDeviceObjects()
     m_pRenderer->CreateDeviceObjects();
 }
 
+void ImGuiImplDiligent::ReconfigureRenderer(const ImGuiDiligentCreateInfo& CI)
+{
+    m_pRenderer->InvalidateDeviceObjects();
+    m_pRenderer = std::make_unique<ImGuiDiligentRenderer>(CI);
+}
+
 } // namespace Diligent

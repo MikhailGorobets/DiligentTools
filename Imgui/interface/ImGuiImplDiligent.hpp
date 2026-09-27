@@ -120,6 +120,10 @@ public:
     void InvalidateDeviceObjects();
     void CreateDeviceObjects();
 
+    /// Recreates the renderer for a different device or back buffer format without destroying the ImGui context.
+    /// Call between frames. If creation fails, call again with the previous configuration to restore rendering.
+    void ReconfigureRenderer(const ImGuiDiligentCreateInfo& CI);
+
 protected:
     std::unique_ptr<ImGuiDiligentRenderer> m_pRenderer;
 };
